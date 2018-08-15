@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbLink", "DbLink\DbLink.csproj", "{82074AB0-75E8-4950-B0CE-92592D40F8C8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "测试", "测试", "{C0FA2903-AC5F-4165-8AE5-EE0E27E8F9A8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbLinkTests", "DbLinkTests\DbLinkTests.csproj", "{3EC10923-7AEF-44F2-81A9-6BB08768D121}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,9 +19,16 @@ Global
 		{82074AB0-75E8-4950-B0CE-92592D40F8C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{82074AB0-75E8-4950-B0CE-92592D40F8C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{82074AB0-75E8-4950-B0CE-92592D40F8C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EC10923-7AEF-44F2-81A9-6BB08768D121}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EC10923-7AEF-44F2-81A9-6BB08768D121}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EC10923-7AEF-44F2-81A9-6BB08768D121}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EC10923-7AEF-44F2-81A9-6BB08768D121}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3EC10923-7AEF-44F2-81A9-6BB08768D121} = {C0FA2903-AC5F-4165-8AE5-EE0E27E8F9A8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6A5888B3-ABC2-4D04-A36F-D6751A2B00EF}
