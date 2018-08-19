@@ -25,9 +25,9 @@ namespace DbLink
             return NeedWhereClause() ? MakeSelectSqlWithWhereClause(): MakeSelectSqlWithoutWhereClause();
         }
 
-        protected bool NeedWhereClause() => _andConditions.Count != 0 || _orConditions.Count != 0;
+        protected bool NeedWhereClause() => NeedAndConditionClause() || NeedOrConditionClause();
 
-        private string MakeSelectSqlWithWhereClause() => (MakeSelectClause() + MakeWhereClause()).TrimEnd();
+        private string MakeSelectSqlWithWhereClause() => (MakeSelectClause() + MakeWhereClause()).TrimEnd().Replace(Space + Space, Space);
 
         private string MakeSelectSqlWithoutWhereClause() => MakeSelectClause().TrimEnd();
 
@@ -81,7 +81,20 @@ namespace DbLink
             return whereClause;
         }
 
-        private bool NeedAndConditionClause() => _andConditions.Count != 0;
+        private bool NeedAndConditionClause() => HasValidCondition(_andConditions);
+
+        private bool HasValidCondition(List<SelectCondition> conditions)
+        {
+            if (conditions.Count == 0) return false;
+
+            foreach (SelectCondition condition in conditions)
+            {
+                if (condition.IsValidCondition())
+                    return true;
+            }
+
+            return false;
+        }
 
         private string MakeAndConditionClause()
         {
@@ -89,17 +102,20 @@ namespace DbLink
             foreach (var andCondition in _andConditions)
             {
                 andConditionClause += andCondition.MakeClause() + Space;
-                if (IsThereOtherAndConditions(andCondition))
+                if (IsThereOtherValidAndConditions(andCondition) && andCondition.IsValidCondition())
                     andConditionClause += "and" + Space;
             }
 
             return andConditionClause;
         }
 
-        private bool IsThereOtherAndConditions(SelectCondition andCondition) => andCondition != _andConditions[_andConditions.Count - 1];
+        private bool IsThereOtherValidAndConditions(SelectCondition andCondition)
+        {
+            return IsThereOtherValidConditionBehindCurrentCondition(andCondition, _andConditions);
+        }
 
 
-        private bool NeedOrConditionClause() => _orConditions.Count != 0;
+        private bool NeedOrConditionClause() => HasValidCondition(_orConditions);
 
         private string MakeOrConditionClause()
         {
@@ -107,14 +123,26 @@ namespace DbLink
             foreach (var orCondition in _orConditions)
             {
                 orConditionClause += orCondition.MakeClause() + Space;
-                if (IsThereOtherOrConditions(orCondition))
+                if (IsThereOtherValidOrConditions(orCondition) && orCondition.IsValidCondition())
                     orConditionClause += "or" + Space;
             }
             return orConditionClause;
         }
 
-        private bool IsThereOtherOrConditions(SelectCondition orCondition) =>
-            orCondition != _orConditions[_orConditions.Count - 1];
+        private bool IsThereOtherValidOrConditions(SelectCondition orCondition)
+        {
+            return IsThereOtherValidConditionBehindCurrentCondition(orCondition, _orConditions);
+        }
+
+        private bool IsThereOtherValidConditionBehindCurrentCondition(SelectCondition currentCondition,
+            List<SelectCondition> conditions)
+        {
+            int index = conditions.FindIndex(item => item.Equals(currentCondition));
+
+            if (index == conditions.Count - 1) return false;
+            List<SelectCondition> conditionsBehindCurrentCondition = conditions.GetRange(index + 1, conditions.Count - index - 1);
+            return HasValidCondition(conditionsBehindCurrentCondition);
+        }
 
         public void AddAndCondition(SelectCondition condition) => _andConditions.Add(condition);
 

@@ -1,10 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using DbLink;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DbLink.Tests
 {
@@ -14,33 +9,14 @@ namespace DbLink.Tests
         private SelectSqlMaker _maker;
         private DbLinkFactory _factory;
 
-        [TestMethod()]
-        public void MakeSelectSqlTest()
-        {
-            TestNoCondition();
-
-            TestSingleFieldSingleCondition();
-
-            TestDoubleFieldsDoubleConditions();
-
-            TestIntBetweenCondition();
-
-            TestDateEqual();
-
-            TestSingleOrCondition();
-
-            TestDoubleOrCondition();
-
-            TestOrConditionOnly();
-
-            TestSingleOrConditionOnly();
-        }
         private void Setup()
         {
             _factory = DbLink.CreateFactory(DataBaseType.MySql);
             _maker = new SelectSqlMaker("User");
         }
-        private void TestNoCondition()
+
+        [TestMethod()]
+        public void TestNoCondition()
         {
             Setup();
             string expected = "select * from User";
@@ -49,7 +25,8 @@ namespace DbLink.Tests
             Assert.AreEqual(expected, actual);
         }
 
-        private void TestSingleFieldSingleCondition()
+        [TestMethod()]
+        public void TestSingleFieldSingleCondition()
         {
             Setup();
             _maker.AddAndCondition(new StringEqual("Name", "张三"));
@@ -61,7 +38,8 @@ namespace DbLink.Tests
             Assert.AreEqual(expected, actual);
         }
 
-        private void TestDoubleFieldsDoubleConditions()
+        [TestMethod()]
+        public void TestDoubleFieldsDoubleConditions()
         {
             Setup();
             _maker.AddAndCondition(new StringEqual("Name", "张三"));
@@ -75,7 +53,8 @@ namespace DbLink.Tests
             Assert.AreEqual(expected, actual);
         }
 
-        private void TestIntBetweenCondition()
+        [TestMethod()]
+        public void TestIntBetweenCondition()
         {
             Setup();
             _maker.AddAndCondition(new IntBetweenCloseInterval("Id", 10, 1));
@@ -91,7 +70,8 @@ namespace DbLink.Tests
             Assert.AreEqual(expected, actual);
         }
 
-        private void TestDateEqual()
+        [TestMethod()]
+        public void TestDateEqual()
         {
             Setup();
             DateTime date = new DateTime(2018, 9, 5);
@@ -104,7 +84,8 @@ namespace DbLink.Tests
             Assert.AreEqual(expected, actual);
         }
 
-        private void TestSingleOrCondition()
+        [TestMethod()]
+        public void TestSingleOrCondition()
         {
             Setup();
             DateTime date = new DateTime(2018, 9, 5);
@@ -118,7 +99,8 @@ namespace DbLink.Tests
             Assert.AreEqual(expected, actual);
         }
 
-        private void TestDoubleOrCondition()
+        [TestMethod()]
+        public void TestDoubleOrCondition()
         {
             Setup();
             DateTime date = new DateTime(2018, 9, 5);
@@ -133,10 +115,10 @@ namespace DbLink.Tests
             Assert.AreEqual(expected, actual);
         }
 
-        private void TestOrConditionOnly()
+        [TestMethod()]
+        public void TestOrConditionOnly()
         {
             Setup();
-            DateTime date = new DateTime(2018, 9, 5);
             _maker.AddOrCondition(new IntEqual("Number", 1));
             _maker.AddOrCondition(new DoubleBetween("DoubleTest", 15, 12));
 
@@ -146,13 +128,83 @@ namespace DbLink.Tests
             Assert.AreEqual(expected, actual);
         }
 
-        private void TestSingleOrConditionOnly()
+        [TestMethod()]
+        public void TestSingleOrConditionOnly()
         {
             Setup();
-            DateTime date = new DateTime(2018, 9, 5);
             _maker.AddOrCondition(new DoubleBetween("DoubleTest", 15, 12));
 
             string expected = "select * from User where DoubleTest>12 and DoubleTest<15";
+            string actual = _maker.MakeSelectSql();
+
+            Assert.AreEqual(expected, actual);
+        }
+
+
+        [TestMethod()]
+        public void TestSingleNullCondition()
+        {
+            Setup();
+
+            _maker.AddAndCondition(new IntEqual("Id", null));
+            string expected = "select * from User";
+            string actual = _maker.MakeSelectSql();
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public void TestNullConditionAmongMultipleConditions()
+        {
+            Setup();
+            _maker.AddAndCondition(new IntEqual("Id", 1));
+            _maker.AddAndCondition(new StringEqual("Name", ""));
+            _maker.AddAndCondition(new StringLike("Department", "软件"));
+
+            string expected = "select * from User where Id=1 and Department like '软件'";
+            string actual = _maker.MakeSelectSql();
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public void TestAndConditionsWithSingleNullOrCondition()
+        {
+            Setup();
+            _maker.AddAndCondition(new IntEqual("Id", 1));
+            _maker.AddOrCondition(new StringEqual("Name", ""));
+            _maker.AddAndCondition(new StringLike("Department", "软件"));
+
+            string expected = "select * from User where Id=1 and Department like '软件'";
+            string actual = _maker.MakeSelectSql();
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public void TestSingleAndConditionDoubleOrConditionWithNull()
+        {
+            Setup();
+            _maker.AddAndCondition(new IntEqual("Id", 1));
+            _maker.AddOrCondition(new StringEqual("Name", ""));
+            _maker.AddOrCondition(new StringLike("Department", "软件"));
+
+            string expected = "select * from User where Id=1 or Department like '软件'";
+            string actual = _maker.MakeSelectSql();
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public void TestAllNullConditions()
+        {
+            Setup();
+            _maker.AddAndCondition(new IntEqual("Id", null));
+            _maker.AddOrCondition(new StringEqual("Name", ""));
+            _maker.AddOrCondition(new StringLike("Department", null));
+            _maker.AddAndCondition(new DoubleBetween("DoubleTest", null, null));
+
+            string expected = "select * from User";
             string actual = _maker.MakeSelectSql();
 
             Assert.AreEqual(expected, actual);
