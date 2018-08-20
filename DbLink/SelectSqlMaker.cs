@@ -111,9 +111,8 @@ namespace DbLink
 
         private bool IsThereOtherValidAndConditions(SelectCondition andCondition)
         {
-            return IsThereOtherValidConditionBehindCurrentCondition(andCondition, _andConditions);
+            return IsThereOtherValidConditionAfterCurrentCondition(andCondition, _andConditions);
         }
-
 
         private bool NeedOrConditionClause() => HasValidCondition(_orConditions);
 
@@ -131,11 +130,10 @@ namespace DbLink
 
         private bool IsThereOtherValidOrConditions(SelectCondition orCondition)
         {
-            return IsThereOtherValidConditionBehindCurrentCondition(orCondition, _orConditions);
+            return IsThereOtherValidConditionAfterCurrentCondition(orCondition, _orConditions);
         }
 
-        private bool IsThereOtherValidConditionBehindCurrentCondition(SelectCondition currentCondition,
-            List<SelectCondition> conditions)
+        private bool IsThereOtherValidConditionAfterCurrentCondition(SelectCondition currentCondition, List<SelectCondition> conditions)
         {
             int index = conditions.FindIndex(item => item.Equals(currentCondition));
 
