@@ -4,7 +4,7 @@ namespace DbLink
 {
     public class User : ActiveRecord
     {
-        public User(IDatabaseDrive dbDrive, IDateTimeFormater dateTimeFormater) : base("User","Id", dbDrive, dateTimeFormater)
+        public User(DbLinkFactory factory) : base("User","Id", factory)
         {
         }
 

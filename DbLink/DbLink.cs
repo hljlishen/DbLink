@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DbLink
 {
@@ -13,14 +9,14 @@ namespace DbLink
     }
     public class DbLink
     {
-        public static DbLinkFactory CreateFactory(DataBaseType type)
+        public static DbLinkFactory CreateFactory(DataBaseType type, string databaseConnectString)
         {
             switch (type)
             {
                 case DataBaseType.MySql:
-                    return new MySqlFactory();
+                    return new MySqlFactory(databaseConnectString);
                 case DataBaseType.Access:
-                    return new AccessFactory();
+                    return new AccessFactory(databaseConnectString);
                 default:
                     throw new Exception("错误的数据库类型");
             }

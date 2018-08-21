@@ -11,7 +11,7 @@ namespace DbLink.Tests
 
         private void Setup()
         {
-            _factory = DbLink.CreateFactory(DataBaseType.MySql);
+            _factory = DbLink.CreateFactory(DataBaseType.MySql, @"Server=localhost;Database=activerecordtest;user id= root;password= root;");
             _maker = new SelectSqlMaker("User");
         }
 
@@ -161,7 +161,7 @@ namespace DbLink.Tests
             _maker.AddAndCondition(new StringEqual("Name", ""));
             _maker.AddAndCondition(new StringLike("Department", "软件"));
 
-            string expected = "select * from User where Id=1 and Department like '软件'";
+            string expected = "select * from User where Id=1 and Department like '%软件%'";
             string actual = _maker.MakeSelectSql();
 
             Assert.AreEqual(expected, actual);
@@ -175,7 +175,7 @@ namespace DbLink.Tests
             _maker.AddOrCondition(new StringEqual("Name", ""));
             _maker.AddAndCondition(new StringLike("Department", "软件"));
 
-            string expected = "select * from User where Id=1 and Department like '软件'";
+            string expected = "select * from User where Id=1 and Department like '%软件%'";
             string actual = _maker.MakeSelectSql();
 
             Assert.AreEqual(expected, actual);
@@ -189,7 +189,7 @@ namespace DbLink.Tests
             _maker.AddOrCondition(new StringEqual("Name", ""));
             _maker.AddOrCondition(new StringLike("Department", "软件"));
 
-            string expected = "select * from User where Id=1 or Department like '软件'";
+            string expected = "select * from User where Id=1 or Department like '%软件%'";
             string actual = _maker.MakeSelectSql();
 
             Assert.AreEqual(expected, actual);

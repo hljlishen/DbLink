@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace DbLink
 {
@@ -12,9 +13,15 @@ namespace DbLink
     }
     public abstract class DbLinkFactory
     {
+        protected string ConnectString;
+
+        protected DbLinkFactory(string connectString)
+        {
+            ConnectString = connectString;
+        }
         public abstract SelectSqlMaker CreateSelectSqlMaker(string fieldName);
 
-        public abstract IDatabaseDrive CreateDatabaseDrive(string connectString);
+        public abstract IDatabaseDrive CreateDatabaseDrive();
 
         public abstract IDateTimeFormater CreateDateTimeFormater();
 
@@ -50,7 +57,7 @@ namespace DbLink
         }
         public override IDateTimeFormater CreateDateTimeFormater() => new StanderdStyleDateTimeFormater();
 
-        public override IDatabaseDrive CreateDatabaseDrive(string connectString) => MySqlDrive.GetInstance(connectString);
+        public override IDatabaseDrive CreateDatabaseDrive() => MySqlDrive.GetInstance(ConnectString);
 
         protected override TableField MakeSpecificDateTimeField(string fieldName)
         {
@@ -60,6 +67,10 @@ namespace DbLink
         protected override TableField MakeSpecificDateField(string fieldName)
         {
             return new DateField(fieldName, null, new StanderdStyleDateTimeFormater());
+        }
+
+        public MySqlFactory(string connectString) : base(connectString)
+        {
         }
     }
 
@@ -71,7 +82,7 @@ namespace DbLink
         }
         public override IDateTimeFormater CreateDateTimeFormater() => new AccessStyleDateTimeFormater();
 
-        public override IDatabaseDrive CreateDatabaseDrive(string connectString) => AccessDrive.GetInstance(connectString);
+        public override IDatabaseDrive CreateDatabaseDrive() => AccessDrive.GetInstance(ConnectString);
 
         protected override TableField MakeSpecificDateTimeField(string fieldName)
         {
@@ -81,6 +92,10 @@ namespace DbLink
         protected override TableField MakeSpecificDateField(string fieldName)
         {
             return new DateField(fieldName, null, new AccessStyleDateTimeFormater());
+        }
+
+        public AccessFactory(string connectString) : base(connectString)
+        {
         }
     }
 }

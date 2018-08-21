@@ -35,10 +35,8 @@ namespace DbLink.Tests
 
         private void Setup()
         {
-            DbLinkFactory factory = DbLink.CreateFactory(DataBaseType.MySql);
-            IDatabaseDrive mySqlDrive = factory.CreateDatabaseDrive(@"Server=localhost;Database=activerecordtest;user id= root;password= root;");
-            IDateTimeFormater formater = factory.CreateDateTimeFormater();
-            _user = new User(mySqlDrive, formater);
+            DbLinkFactory factory = DbLink.CreateFactory(DataBaseType.MySql, @"Server=localhost;Database=activerecordtest;user id= root;password= root;");
+            _user = new User(factory);
         }
 
         private void TestAllConditionNotNull()

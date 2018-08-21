@@ -15,11 +15,11 @@ namespace DbLink
         private const string Space = " ";
         private readonly TableFieldManager _tableFieldManager;
 
-        protected ActiveRecord(string tableName, string primaryKeyName, IDatabaseDrive dbDrive, IDateTimeFormater dateTimeFormater)
+        protected ActiveRecord(string tableName, string primaryKeyName, DbLinkFactory factory)
         {
             TableName = tableName;
-            DatabaseDrive = dbDrive;
-            DateTimeFormater = dateTimeFormater;
+            DatabaseDrive = factory.CreateDatabaseDrive();
+            DateTimeFormater = factory.CreateDateTimeFormater();
             _fields = new List<TableField>();
             _tableFieldManager = new TableFieldManager(this, DateTimeFormater);
             AddTableFieldsFromProperties();
