@@ -67,7 +67,7 @@
     <Compile Include="SelectCondition\StringEqual.cs" />
     <Compile Include="SelectCondition\StringLike.cs" />
     <Compile Include="TableField.cs" />
-    <Compile Include="TableFieldGenerator.cs" />
+    <Compile Include="TableFieldManager.cs" />
     <Compile Include="User.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

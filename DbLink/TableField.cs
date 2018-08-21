@@ -118,15 +118,15 @@ namespace DbLink
             DateTimeFormater = formater;
         }
 
-        public override string MakeClause() => $"{GetFieldName()}={DateTimeFormater.DateString((DateTime)FieldValue)}";
+        public override string MakeClause() => $"{GetFieldName()}={DateTimeFormater.DateString((DateTime?)FieldValue)}";
 
-        public override string GetValueString() => DateTimeFormater.DateString((DateTime)FieldValue);
+        public override string GetValueString() => DateTimeFormater.DateString((DateTime?)FieldValue);
 
         public override void SetValue(object value)
         {
             try
             {
-                FieldValue = (DateTime)value;
+                FieldValue = (DateTime?)value;
             }
             catch
             {
@@ -146,6 +146,6 @@ namespace DbLink
 
         public override string GetValueString() => ((double) FieldValue).ToString(CultureInfo.InvariantCulture);
 
-        public override void SetValue(object value) => FieldValue = double.Parse(value.ToString());
+        public override void SetValue(object value) => FieldValue = value;
     }
 }

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Data;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace DbLink
 {
@@ -14,37 +10,37 @@ namespace DbLink
 
         public int? Id
         {
-            get => (int?)GetFieldValue("Id");
-            set => SetFieldValue("Id", value);
+            get;
+            set;
         }
         public string Name
         {
-            get => (string)GetFieldValue("Name");
-            set => SetFieldValue("Name", value);
+            get;
+            set;
         }
 
         public string Department
         {
-            get => (string)GetFieldValue("Department");
-            set => SetFieldValue("Department", value);
+            get;
+            set;
         }
 
         public int? Number
         {
-            get => (int?)GetFieldValue("Number");
-            set => SetFieldValue("Number", value);
+            get;
+            set;
         }
 
         public DateTime? InsertTime
         {
-            get => (DateTime?)GetFieldValue("InsertTime");
-            set => SetFieldValue("InsertTime", value);
+            get;
+            set;
         }
 
         public double? DoubleTest
         {
-            get => (double?)GetFieldValue("DoubleTest");
-            set => SetFieldValue("DoubleTest", value);
+            get;
+            set;
         }
     }
 }

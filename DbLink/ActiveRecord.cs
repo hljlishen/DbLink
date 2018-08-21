@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Linq;
 using System.Reflection;
-using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
 
 namespace DbLink
 {
@@ -17,6 +13,7 @@ namespace DbLink
         protected IDateTimeFormater DateTimeFormater;
         private string _primaryKeyName = "";
         private const string Space = " ";
+        private readonly TableFieldManager _tableFieldManager;
 
         protected ActiveRecord(string tableName, string primaryKeyName, IDatabaseDrive dbDrive, IDateTimeFormater dateTimeFormater)
         {
@@ -24,6 +21,7 @@ namespace DbLink
             DatabaseDrive = dbDrive;
             DateTimeFormater = dateTimeFormater;
             _fields = new List<TableField>();
+            _tableFieldManager = new TableFieldManager(this, DateTimeFormater);
             AddTableFieldsFromProperties();
             SetPrimaryKey(primaryKeyName);
         }
@@ -37,14 +35,14 @@ namespace DbLink
 
         private void AddTableFieldsFromProperties()
         {
-            var fields = new TableFieldGenerator(DateTimeFormater).MapPropertiesToTableFields(this);
+            var fields = _tableFieldManager.CreateTableFields();
             foreach (TableField tableField in fields)
             {
                 AddField(tableField);
             }
         }
 
-        protected void AddField(TableField field)
+        private void AddField(TableField field)
         {
             string fieldName = field.GetFieldName();
 
@@ -65,7 +63,7 @@ namespace DbLink
             return false;
         }
 
-        protected void SetFieldValue(string fieldName, object value)
+        private void SetFieldValue(string fieldName, object value)
         {
             TableField field = FindTableFieldByName(fieldName);
             field.SetValue(value);
@@ -85,7 +83,7 @@ namespace DbLink
             return null;
         }
 
-        protected object GetFieldValue(string fieldName)
+        private object GetFieldValue(string fieldName)
         {
             if (!FieldNameAlreadyExists(fieldName))
                 throw new Exception($"域名<{fieldName}>不存在");
@@ -93,7 +91,11 @@ namespace DbLink
             return field.FieldValue;
         }
 
-        public string MakeInsertSqlCommand() => $"insert into {TableName} " + MakeSelectFieldsClause() + MakeSelectValuesClause();
+        public string MakeInsertSqlCommand()
+        {
+            _tableFieldManager.UpdateFields();
+            return $"insert into {TableName} " + MakeSelectFieldsClause() + MakeSelectValuesClause();
+        }
 
         private string MakeSelectFieldsClause()
         {
@@ -117,8 +119,6 @@ namespace DbLink
         }
 
         private bool IsTheLastField(TableField field) => field == _fields[_fields.Count - 1];
-
-        private bool IsTheFirstField(TableField field) => field == _fields[0];
 
         private string RemoveLastIndex(string str) => str.Substring(0, str.Length - 1);
 
@@ -153,6 +153,7 @@ namespace DbLink
 
         protected string MakeUpdateValuesClause()
         {
+            _tableFieldManager.UpdateFields();
             string updateValuesClause = "";
             foreach (TableField field in _fields)
             {
