@@ -3,7 +3,7 @@ using MySql.Data.MySqlClient;
 
 namespace DbLink
 {
-    public class MySqlDrive : DatabaseDrive
+    internal class MySqlDrive : DatabaseDrive
     {
         private static MySqlDrive _instance;
         private static readonly object SyncRoot = new object();

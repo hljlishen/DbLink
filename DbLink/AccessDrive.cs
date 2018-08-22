@@ -3,7 +3,7 @@ using System.Data.OleDb;
 
 namespace DbLink
 {
-    public class AccessDrive : DatabaseDrive
+    internal class AccessDrive : DatabaseDrive
     {
         private static AccessDrive _instance;
         private static readonly object SyncRoot = new object();

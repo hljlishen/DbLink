@@ -20,10 +20,7 @@ namespace DbLink
             _selectFields = new List<string>();
         }
 
-        public string MakeSelectSql()
-        {
-            return NeedWhereClause() ? MakeSelectSqlWithWhereClause(): MakeSelectSqlWithoutWhereClause();
-        }
+        public string MakeSelectSql() => NeedWhereClause() ? MakeSelectSqlWithWhereClause(): MakeSelectSqlWithoutWhereClause();
 
         protected bool NeedWhereClause() => NeedAndConditionClause() || NeedOrConditionClause();
 
@@ -155,6 +152,5 @@ namespace DbLink
                 throw new Exception($"{field}不能重复添加");
             }
         }
-
     }
 }

@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace DbLink
 {
-    public abstract class TableField
+    internal abstract class TableField
     {
         protected TableField(string fieldName)
         {
