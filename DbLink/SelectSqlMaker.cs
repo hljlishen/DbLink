@@ -146,7 +146,7 @@ namespace DbLink
 
         public void AddOrCondition(SelectCondition condition) => _orConditions.Add(condition);
 
-        public void AddFieldsWillBeSelected(string field)
+        public void AddSelectField(string field)
         {
             if(!_selectFields.Contains(field))
                 _selectFields.Add(field);

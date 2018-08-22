@@ -30,7 +30,7 @@ namespace DbLink.Tests
         {
             Setup();
             _maker.AddAndCondition(new StringEqual("Name", "张三"));
-            _maker.AddFieldsWillBeSelected("Name");
+            _maker.AddSelectField("Name");
 
             string expected = "select Name from User where Name='张三'";
             string actual = _maker.MakeSelectSql();
@@ -44,8 +44,8 @@ namespace DbLink.Tests
             Setup();
             _maker.AddAndCondition(new StringEqual("Name", "张三"));
             _maker.AddAndCondition(new IntEqual("Id", 1));
-            _maker.AddFieldsWillBeSelected("Name");
-            _maker.AddFieldsWillBeSelected("Department");
+            _maker.AddSelectField("Name");
+            _maker.AddSelectField("Department");
 
             string expected = "select Name,Department from User where Name='张三' and Id=1";
             string actual = _maker.MakeSelectSql();
