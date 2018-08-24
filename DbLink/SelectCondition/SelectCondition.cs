@@ -13,7 +13,11 @@ namespace DbLink
             FieldName = fieldName;
         }
 
-        public abstract string MakeClause();
+        public string MakeClause() => IsValidCondition() ? MakeValidClause() : MakeInvalidClause();
+
+        protected abstract string MakeValidClause();
+
+        private string MakeInvalidClause() => "";
 
         public abstract bool IsValidCondition();
     }

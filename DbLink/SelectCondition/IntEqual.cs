@@ -15,7 +15,7 @@
                 _intValue = int.Parse(intStringNullable);
         }
 
-        public override string MakeClause() => IsValidCondition() ? $"{FieldName}={_intValue}" : "";
+        protected override string MakeValidClause() => $"{FieldName}={_intValue}";
 
         public override bool IsValidCondition() => _intValue != null;
     }

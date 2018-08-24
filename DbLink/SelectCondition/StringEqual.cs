@@ -9,7 +9,7 @@
             _strValue = strValue;
         }
 
-        public override string MakeClause() => IsValidCondition() ? $"{FieldName}='{_strValue}'" : "";
+        protected override string MakeValidClause() => $"{FieldName}='{_strValue}'";
 
         public override bool IsValidCondition() => !string.IsNullOrEmpty(_strValue);
     }

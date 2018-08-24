@@ -19,7 +19,7 @@
                 _min = int.Parse(minStringNullable);
         }
 
-        public override string MakeClause() =>IsValidCondition() ? $"{FieldName}>{_min} and {FieldName}<{_max}" : "";
+        protected override string MakeValidClause() => $"{FieldName}>{_min} and {FieldName}<{_max}";
         public override bool IsValidCondition() => _max != null && _min != null;
     }
 }

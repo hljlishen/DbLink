@@ -49,6 +49,7 @@
     <Compile Include="AccessDrive.cs" />
     <Compile Include="ActiveRecord.cs" />
     <Compile Include="DatabaseDrive.cs" />
+    <Compile Include="SelectCondition\DateBetweenOpenInterval.cs" />
     <Compile Include="SelectCondition\DateEqual.cs" />
     <Compile Include="SelectCondition\DateTimeBetweenCloseInterval.cs" />
     <Compile Include="DbLink.cs" />

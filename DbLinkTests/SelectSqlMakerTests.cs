@@ -209,5 +209,18 @@ namespace DbLink.Tests
 
             Assert.AreEqual(expected, actual);
         }
+
+        [TestMethod()]
+        public void TestDateBetweenOpenInterval()
+        {
+            Setup();
+            DateTime begin = new DateTime(2018,9,9);
+            DateTime end = new DateTime(2019,10,10);
+            _maker.AddAndCondition(new DateBetweenOpenInterval("Date", begin, end, _factory.CreateDateTimeFormater()));
+            string expected = "select * from User where Date>'2018-09-09' and Date<'2019-10-10'";
+            string actual = _maker.MakeSelectSql();
+
+            Assert.AreEqual(expected, actual);
+        }
     }
 }

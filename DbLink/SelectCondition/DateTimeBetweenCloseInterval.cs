@@ -15,16 +15,13 @@ namespace DbLink
             DateTimeFormater = dateTimeFormater;
         }
 
-        public override string MakeClause()
+        protected override string MakeValidClause()
         {
-            if (DateTimeFormater == null)
-                throw new Exception("没有设置有效的DateTimeFormater");
-            if (!IsValidCondition()) return "";
             string begin = DateTimeFormater.DateTimeString(_begin);
             string end = DateTimeFormater.DateTimeString(_end);
             return $"{FieldName}>={begin} and {FieldName}<={end}";
         }
 
-        public override bool IsValidCondition() => _begin != null && _end != null;
+        public override bool IsValidCondition() => _begin != null && _end != null && DateTimeFormater != null;
     }
 }
