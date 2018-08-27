@@ -222,5 +222,18 @@ namespace DbLink.Tests
 
             Assert.AreEqual(expected, actual);
         }
+
+        [TestMethod()]
+        public void TestDateTimeDiff()
+        {
+            Setup();
+            DateTime d = new DateTime(2009, 9, 1, 6, 15, 12);
+            _maker.AddAndCondition(new DateDiffLessThanMinutesCondition("shengchandingxingriqi", d, 5, _factory.CreateDateTimeFormater()));
+            string expected =
+                "select * from User where DATEDIFF(Minute, '2009-09-01 06:15:12', shengchandingxingriqi)<5";
+            string actual = _maker.MakeSelectSql();
+
+            Assert.AreEqual(expected, actual);
+        }
     }
 }
