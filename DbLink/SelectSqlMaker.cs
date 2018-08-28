@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DbLink
 {
-    public class SelectSqlMaker
+    internal class SelectSqlMaker : ISelectSqlMaker
     {
         private readonly string _tableName;
         private readonly List<SelectCondition> _andConditions;

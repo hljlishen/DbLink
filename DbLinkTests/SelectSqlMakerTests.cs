@@ -6,13 +6,13 @@ namespace DbLink.Tests
     [TestClass()]
     public class SelectSqlMakerTests
     {
-        private SelectSqlMaker _maker;
+        private ISelectSqlMaker _maker;
         private DbLinkFactory _factory;
 
         private void Setup()
         {
             _factory = DbLink.CreateFactory(DataBaseType.MySql, @"Server=localhost;Database=activerecordtest;user id= root;password= root;");
-            _maker = new SelectSqlMaker("User");
+            _maker = _factory.CreateSelectSqlMaker("User");
         }
 
         [TestMethod()]

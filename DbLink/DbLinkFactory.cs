@@ -9,7 +9,7 @@
             ConnectString = connectString;
         }
 
-        public SelectSqlMaker CreateSelectSqlMaker(string tableName) => new SelectSqlMaker(tableName);
+        public ISelectSqlMaker CreateSelectSqlMaker(string tableName) => new SelectSqlMaker(tableName);
 
         public abstract IDatabaseDrive CreateDatabaseDrive();
 
