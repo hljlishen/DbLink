@@ -173,7 +173,7 @@ namespace DbLink
 
         protected string MakeDeleteSqlCommand() => $"delete from {TableName} where {_primaryKeyName}={GetFieldValue(_primaryKeyName)}";
 
-        public void Insert()
+        public virtual void Insert()
         {
             if (!IsThisRecordAlreadyInDataBase())
                 DatabaseDrive.ExecuteInsert(MakeInsertSqlCommand());
@@ -187,7 +187,7 @@ namespace DbLink
             return primaryKeyValue != null;
         }
 
-        public void Update()
+        public virtual void Update()
         {
             if(IsThisRecordAlreadyInDataBase())
                 DatabaseDrive.ExecuteUpdate(MakeUpdateSqlCommand());
@@ -195,7 +195,7 @@ namespace DbLink
                 throw new Exception($"主键{_primaryKeyName}值为null，不能执行update");
         }
 
-        public void Delete()
+        public virtual void Delete()
         {
             if (IsThisRecordAlreadyInDataBase())
                 DatabaseDrive.ExecuteDelete(MakeDeleteSqlCommand());
