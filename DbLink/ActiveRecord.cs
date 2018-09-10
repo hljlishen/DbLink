@@ -203,13 +203,13 @@ namespace DbLink
                 throw new Exception($"主键{_primaryKeyName}值为null，不能执行delete");
         }
 
-        public static DataRowCollection Select(string selectSql, IDatabaseDrive dbDrive)
+        public static DataTable Select(string selectSql, IDatabaseDrive dbDrive)
         {
             DataSet queryResult = dbDrive.ExecuteSelect(selectSql);
-            return queryResult.Tables[0].Rows;
+            return queryResult.Tables[0];
         }
 
-        public DataRowCollection Select(string selectSql) => Select(selectSql, DatabaseDrive);
+        public DataTable Select(string selectSql) => Select(selectSql, DatabaseDrive);
 
         public void LoadDbDataFromDataRow(DataRow row)
         {
