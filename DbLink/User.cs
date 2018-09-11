@@ -37,7 +37,7 @@ namespace DbLink
             set;
         }
 
-        public double? DoubleTest
+        public double? Doubletest
         {
             get;
             set;
