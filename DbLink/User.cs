@@ -8,7 +8,7 @@ namespace DbLink
         {
         }
 
-        public int? Id
+        public uint? Id
         {
             get;
             set;

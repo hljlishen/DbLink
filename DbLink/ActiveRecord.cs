@@ -214,50 +214,46 @@ namespace DbLink
 
         public static DataTable SelectAll(IDatabaseDrive dbDrive) => dbDrive.ExecuteSelect("select * from User").Tables[0];
 
-        //public void LoadDataRow(DataRow row)
-        //{
-        //    PropertyInfo[] property = GetType().GetProperties();
-        //    try
-        //    {
-        //        foreach (PropertyInfo propertyInfo in property)
-        //        {
-        //            string name = propertyInfo.Name;
-        //            object value = row[name];
-        //            if (value is uint)
-        //                propertyInfo.SetValue(this, (uint?)value);
-        //            if (value is int)
-        //                propertyInfo.SetValue(this, value as int?);
-        //            if(value is string)
-        //                propertyInfo.SetValue(this, value);
-        //            if (value is DateTime)
-        //                propertyInfo.SetValue(this, value as DateTime?);
-        //            if (value is double)
-        //                propertyInfo.SetValue(this, value as double?);
+        public virtual void LoadDataRow(DataRow row)
+        {
+            PropertyInfo[] property = GetType().GetProperties();
+            try
+            {
+                foreach (PropertyInfo propertyInfo in property)
+                {
+                    string name = propertyInfo.Name;
+                    object value = row[name];
+                    if(value is System.DBNull)
+                        propertyInfo.SetValue(this, null);
+                    else
+                        propertyInfo.SetValue(this, value);
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
 
-        //            throw new Exception($"b不支持的类型{value.GetType()}");
-        //        }
-        //    }
-        //    catch(Exception e)
-        //    {
-        //        throw e;
-        //    }
-        //}
-
-        //public void LoadDataGridViewRow(DataGridViewRow row)
-        //{
-        //    PropertyInfo[] property = GetType().GetProperties();
-        //    try
-        //    {
-        //        foreach (PropertyInfo propertyInfo in property)
-        //        {
-        //            string name = propertyInfo.Name;
-        //            propertyInfo.SetValue(this, row.Cells[name].Value);
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        throw new Exception(@"DataRow的数据不匹配");
-        //    }
-        //}
+        public virtual void LoadDataGridViewRow(DataGridViewRow row)
+        {
+            PropertyInfo[] property = GetType().GetProperties();
+            try
+            {
+                foreach (PropertyInfo propertyInfo in property)
+                {
+                    string name = propertyInfo.Name;
+                    object value = row.Cells[name].Value;
+                    if (value is System.DBNull)
+                        propertyInfo.SetValue(this, null);
+                    else
+                        propertyInfo.SetValue(this, value);
+                }
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
+        }
     }
 }

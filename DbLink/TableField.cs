@@ -76,6 +76,29 @@ namespace DbLink
         }
     }
 
+    internal class UintField : TableField
+    {
+        public UintField(string fieldName, uint? fieldFieldValue) : base(fieldName)
+        {
+            FieldValue = fieldFieldValue;
+        }
+
+        public override string MakeClause() => $"{GetFieldName()}={FieldValue}";
+        public override string GetValueString() => FieldValue.ToString();
+        public override void SetValue(object value)
+        {
+            try
+            {
+                uint? intValue = (uint?)value;
+                FieldValue = intValue;
+            }
+            catch
+            {
+                throw new Exception("value值不是uint类型");
+            }
+        }
+    }
+
     internal class DateTimeField : TableField
     {
         public IDateTimeFormater DateTimeFormater { get; set; }

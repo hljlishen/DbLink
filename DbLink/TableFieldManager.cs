@@ -37,6 +37,10 @@ namespace DbLink
 
         private TableField MapPropertyToTableField(PropertyInfo property)
         {
+            if(property.PropertyType == typeof(uint?))
+            {
+                return new UintField(property.Name, null);
+            }
             if (property.PropertyType == typeof(int?))
             {
                 return new IntField(property.Name, null);
