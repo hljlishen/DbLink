@@ -5,7 +5,8 @@ namespace DbLink
     public enum DataBaseType
     {
         MySql,
-        Access
+        Access,
+        SqlServer
     }
     public class DbLink
     {
@@ -17,6 +18,8 @@ namespace DbLink
                     return new MySqlFactory(databaseConnectString);
                 case DataBaseType.Access:
                     return new AccessFactory(databaseConnectString);
+                case DataBaseType.SqlServer:
+                    return new SqlServerFactory(databaseConnectString);
                 default:
                     throw new Exception("错误的数据库类型");
             }

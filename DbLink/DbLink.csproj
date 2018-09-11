@@ -66,6 +66,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SelectCondition\SelectCondition.cs" />
     <Compile Include="SelectSqlMaker.cs" />
+    <Compile Include="SqlServerDrive.cs" />
     <Compile Include="SqlSyntaxPrinter.cs" />
     <Compile Include="SelectCondition\StringEqual.cs" />
     <Compile Include="SelectCondition\StringLike.cs" />

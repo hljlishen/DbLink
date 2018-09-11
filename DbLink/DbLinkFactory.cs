@@ -37,4 +37,15 @@
 
         public override IDatabaseDrive CreateDatabaseDrive() => AccessDrive.GetInstance(ConnectString);
     }
+
+    internal class SqlServerFactory : DbLinkFactory
+    {
+        public SqlServerFactory(string connectString) : base(connectString)
+        {
+        }
+
+        public override IDatabaseDrive CreateDatabaseDrive() => SqlServerDrive.GetInstance(ConnectString);
+
+        public override IDateTimeFormater CreateDateTimeFormater() => new StanderdStyleDateTimeFormater();
+    }
 }

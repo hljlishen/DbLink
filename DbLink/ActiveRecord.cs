@@ -8,7 +8,7 @@ namespace DbLink
 {
     public abstract class ActiveRecord
     {
-        private readonly List<TableField> _fields;
+        private readonly List<TableField> _selectFields;
         protected string TableName;
         protected IDatabaseDrive DatabaseDrive;
         protected IDateTimeFormater DateTimeFormater;
@@ -21,7 +21,7 @@ namespace DbLink
             TableName = tableName;
             DatabaseDrive = factory.CreateDatabaseDrive();
             DateTimeFormater = factory.CreateDateTimeFormater();
-            _fields = new List<TableField>();
+            _selectFields = new List<TableField>();
             _tableFieldManager = new TableFieldManager(this, DateTimeFormater);
             AddTableFieldsFromProperties();
             SetPrimaryKey(primaryKeyName);
@@ -50,12 +50,12 @@ namespace DbLink
             if (FieldNameAlreadyExists(fieldName))
                 throw new Exception($"添加的域已经在列表中<{fieldName}>");
 
-            _fields.Add(field);
+            _selectFields.Add(field);
         }
 
         private bool FieldNameAlreadyExists(string fieldName)
         {
-            foreach (TableField field in _fields)
+            foreach (TableField field in _selectFields)
             {
                 if (field.GetFieldName() == fieldName)
                     return true;
@@ -75,7 +75,7 @@ namespace DbLink
             if (!FieldNameAlreadyExists(fieldName))
                 throw new Exception($"域{fieldName}不存在");
 
-            foreach (TableField field in _fields)
+            foreach (TableField field in _selectFields)
             {
                 if (field.GetFieldName() == fieldName)
                     return field;
@@ -102,7 +102,7 @@ namespace DbLink
         {
             string fieldsClause = "(";
 
-            foreach (TableField field in _fields)
+            foreach (TableField field in _selectFields)
             {
                 if(!field.HasValue())
                 {
@@ -119,7 +119,7 @@ namespace DbLink
             return fieldsClause;
         }
 
-        private bool IsTheLastField(TableField field) => field == _fields[_fields.Count - 1];
+        private bool IsTheLastField(TableField field) => field == _selectFields[_selectFields.Count - 1];
 
         private string RemoveLastIndex(string str) => str.Substring(0, str.Length - 1);
 
@@ -127,7 +127,7 @@ namespace DbLink
         {
             string valuesClause = "values (";
 
-            foreach (TableField field in _fields)
+            foreach (TableField field in _selectFields)
             {
                 if (!field.HasValue())
                 {
@@ -156,7 +156,7 @@ namespace DbLink
         {
             _tableFieldManager.UpdateFields();
             string updateValuesClause = "";
-            foreach (TableField field in _fields)
+            foreach (TableField field in _selectFields)
             {
                 if (!field.HasValue())
                 {
@@ -211,8 +211,6 @@ namespace DbLink
         }
 
         public DataTable Select(string selectSql) => Select(selectSql, DatabaseDrive);
-
-        public static DataTable SelectAll(IDatabaseDrive dbDrive) => dbDrive.ExecuteSelect("select * from User").Tables[0];
 
         public virtual void LoadDataRow(DataRow row)
         {
