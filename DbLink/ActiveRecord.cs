@@ -8,11 +8,12 @@ namespace DbLink
 {
     public abstract class ActiveRecord
     {
-        private readonly List<TableField> _selectFields;
+        private readonly List<TableField> _dataBaseFields;
         protected string TableName;
         protected IDatabaseDrive DatabaseDrive;
         protected IDateTimeFormater DateTimeFormater;
         private string _primaryKeyName = "";
+        private TableField _primaryKeyField;
         private const string Space = " ";
         private readonly TableFieldManager _tableFieldManager;
 
@@ -21,22 +22,24 @@ namespace DbLink
             TableName = tableName;
             DatabaseDrive = factory.CreateDatabaseDrive();
             DateTimeFormater = factory.CreateDateTimeFormater();
-            _selectFields = new List<TableField>();
+            _dataBaseFields = new List<TableField>();
             _tableFieldManager = new TableFieldManager(this, DateTimeFormater);
-            AddTableFieldsFromProperties();
+            AddTableFields(_tableFieldManager.CreateTableFields());
             SetPrimaryKey(primaryKeyName);
         }
 
         private void SetPrimaryKey(string primaryKeyName)
         {
-            if(FieldNameAlreadyExists(primaryKeyName))
+            if (FieldNameAlreadyExists(primaryKeyName))
+            {
                 _primaryKeyName = primaryKeyName;
+                _primaryKeyField = FindTableFieldByName(primaryKeyName);
+            }
             else throw new Exception($"指定的主键<{primaryKeyName}>不存在");
         }
 
-        private void AddTableFieldsFromProperties()
+        private void AddTableFields(IEnumerable<TableField> fields)
         {
-            var fields = _tableFieldManager.CreateTableFields();
             foreach (TableField tableField in fields)
             {
                 AddField(tableField);
@@ -50,12 +53,12 @@ namespace DbLink
             if (FieldNameAlreadyExists(fieldName))
                 throw new Exception($"添加的域已经在列表中<{fieldName}>");
 
-            _selectFields.Add(field);
+            _dataBaseFields.Add(field);
         }
 
         private bool FieldNameAlreadyExists(string fieldName)
         {
-            foreach (TableField field in _selectFields)
+            foreach (TableField field in _dataBaseFields)
             {
                 if (field.GetFieldName() == fieldName)
                     return true;
@@ -64,18 +67,18 @@ namespace DbLink
             return false;
         }
 
-        private void SetFieldValue(string fieldName, object value)
-        {
-            TableField field = FindTableFieldByName(fieldName);
-            field.SetValue(value);
-        }
+        //private void SetFieldValue(string fieldName, object value)
+        //{
+        //    TableField field = FindTableFieldByName(fieldName);
+        //    field.SetValue(value);
+        //}
 
         private TableField FindTableFieldByName(string fieldName)
         {
             if (!FieldNameAlreadyExists(fieldName))
                 throw new Exception($"域{fieldName}不存在");
 
-            foreach (TableField field in _selectFields)
+            foreach (TableField field in _dataBaseFields)
             {
                 if (field.GetFieldName() == fieldName)
                     return field;
@@ -84,25 +87,21 @@ namespace DbLink
             return null;
         }
 
-        private object GetFieldValue(string fieldName)
-        {
-            if (!FieldNameAlreadyExists(fieldName))
-                throw new Exception($"域名<{fieldName}>不存在");
-            TableField field = FindTableFieldByName(fieldName);
-            return field.FieldValue;
-        }
+        //private object GetFieldValue(string fieldName)
+        //{
+        //    if (!FieldNameAlreadyExists(fieldName))
+        //        throw new Exception($"域名<{fieldName}>不存在");
+        //    TableField field = FindTableFieldByName(fieldName);
+        //    return field.FieldValue;
+        //}
 
-        public string MakeInsertSqlCommand()
-        {
-            _tableFieldManager.UpdateFields();
-            return $"insert into {TableName} " + MakeSelectFieldsClause() + MakeSelectValuesClause();
-        }
+        public string MakeInsertSqlCommand() => $"insert into {TableName} " + MakeSelectFieldsClause() + MakeSelectValuesClause();
 
         private string MakeSelectFieldsClause()
         {
             string fieldsClause = "(";
 
-            foreach (TableField field in _selectFields)
+            foreach (TableField field in _dataBaseFields)
             {
                 if(!field.HasValue())
                 {
@@ -119,7 +118,7 @@ namespace DbLink
             return fieldsClause;
         }
 
-        private bool IsTheLastField(TableField field) => field == _selectFields[_selectFields.Count - 1];
+        private bool IsTheLastField(TableField field) => field == _dataBaseFields[_dataBaseFields.Count - 1];
 
         private string RemoveLastIndex(string str) => str.Substring(0, str.Length - 1);
 
@@ -127,7 +126,7 @@ namespace DbLink
         {
             string valuesClause = "values (";
 
-            foreach (TableField field in _selectFields)
+            foreach (TableField field in _dataBaseFields)
             {
                 if (!field.HasValue())
                 {
@@ -146,19 +145,17 @@ namespace DbLink
 
         public virtual string MakeUpdateSqlCommand()
         {
-            _tableFieldManager.UpdateFields();
-            TableField keyField = FindTableFieldByName(_primaryKeyName);
             string updateSql = $"update {TableName} set" + Space;
             updateSql += MakeUpdateValuesClause() + Space;
-            updateSql += $"where {keyField.MakeClause()}";
+            updateSql += $"where {_primaryKeyField.MakeClause()}";
             return updateSql;
         }
 
         protected string MakeUpdateValuesClause()
         {
-            _tableFieldManager.UpdateFields();
+            UpdateFieldValue();
             string updateValuesClause = "";
-            foreach (TableField field in _selectFields)
+            foreach (TableField field in _dataBaseFields)
             {
                 if (!field.HasValue())
                 {
@@ -174,30 +171,25 @@ namespace DbLink
             return updateValuesClause;
         }
 
-        public string MakeDeleteSqlCommand()
-        {
-            _tableFieldManager.UpdateFields();
-            TableField keyField = FindTableFieldByName(_primaryKeyName);
-            return $"delete from {TableName} where {keyField.MakeClause()}";
-        }
+        public void UpdateFieldValue() => _tableFieldManager.UpdateFields(); 
+
+        public string MakeDeleteSqlCommand() => $"delete from {TableName} where {_primaryKeyField.MakeClause()}";
 
         public virtual void Insert()
         {
+            UpdateFieldValue();
             if (!IsThisRecordAlreadyInDataBase())
                 DatabaseDrive.ExecuteInsert(MakeInsertSqlCommand());
             else
                 throw new Exception($"主键{_primaryKeyName}值不为null，不能执行Insert");
         }
 
-        private bool IsThisRecordAlreadyInDataBase()
-        {
-            object primaryKeyValue = GetFieldValue(_primaryKeyName);
-            return primaryKeyValue != null;
-        }
+        private bool IsThisRecordAlreadyInDataBase() => _primaryKeyField.FieldValue != null;
 
         public virtual void Update()
         {
-            if(IsThisRecordAlreadyInDataBase())
+            UpdateFieldValue();
+            if (IsThisRecordAlreadyInDataBase())
                 DatabaseDrive.ExecuteUpdate(MakeUpdateSqlCommand());
             else
                 throw new Exception($"主键{_primaryKeyName}值为null，不能执行update");
@@ -205,6 +197,7 @@ namespace DbLink
 
         public virtual void Delete()
         {
+            UpdateFieldValue();
             if (IsThisRecordAlreadyInDataBase())
                 DatabaseDrive.ExecuteDelete(MakeDeleteSqlCommand());
             else

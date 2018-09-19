@@ -47,6 +47,7 @@ namespace DbLink.Tests
             _user.Number = 123;
             _user.InsertTime = new DateTime(2018, 3, 11, 23, 14, 59);
 
+            _user.UpdateFieldValue();
             string expected = "insert into User (Name,Department,Number,InsertTime) values ('张三','JDR',123,'2018-03-11 23:14:59')";
             string actual = _user.MakeInsertSqlCommand();
 
@@ -60,6 +61,7 @@ namespace DbLink.Tests
             _user.Number = 123;
             _user.InsertTime = null;
 
+            _user.UpdateFieldValue();
             string expected = "insert into User (Name,Department,Number) values ('张三','JDR',123)";
             string actual = _user.MakeInsertSqlCommand();
 
@@ -73,6 +75,7 @@ namespace DbLink.Tests
             _user.Number = 123;
             _user.InsertTime = new DateTime(2018, 3, 11, 23, 14, 59);
 
+            _user.UpdateFieldValue();
             string expected = "insert into User (Name,Number,InsertTime) values ('张三',123,'2018-03-11 23:14:59')";
             string actual = _user.MakeInsertSqlCommand();
 
@@ -86,6 +89,7 @@ namespace DbLink.Tests
             _user.Number = 123;
             _user.InsertTime = new DateTime(2018, 3, 11, 23, 14, 59);
 
+            _user.UpdateFieldValue();
             string expected = "insert into User (Department,Number,InsertTime) values ('JDR',123,'2018-03-11 23:14:59')";
             string actual = _user.MakeInsertSqlCommand();
 
@@ -99,6 +103,7 @@ namespace DbLink.Tests
             _user.Number = null;
             _user.InsertTime = new DateTime(2018, 3, 11, 23, 14, 59);
 
+            _user.UpdateFieldValue();
             string expected = "insert into User (Name,Department,InsertTime) values ('张三','JDR','2018-03-11 23:14:59')";
             string actual = _user.MakeInsertSqlCommand();
 
@@ -111,9 +116,9 @@ namespace DbLink.Tests
             Setup();
             _user.Id = 3;
 
+            _user.UpdateFieldValue();
             string actual = _user.MakeDeleteSqlCommand();
             string expected = "delete from User where Id=3";
-            _user.Delete();
 
             Assert.AreEqual(actual,expected);
         }
