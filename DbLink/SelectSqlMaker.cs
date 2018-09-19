@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DbLink
 {
-    internal class SelectSqlMaker : ISelectSqlMaker
+    public class SelectSqlMaker : ISelectSqlMaker
     {
         private readonly string _tableName;
         private readonly List<SelectCondition> _andConditions;
@@ -18,6 +18,13 @@ namespace DbLink
             _andConditions = new List<SelectCondition>();
             _orConditions = new List<SelectCondition>();
             _selectFields = new List<string>();
+        }
+
+        public void Clear()
+        {
+            _andConditions.Clear();
+            _orConditions.Clear();
+            _selectFields.Clear();
         }
 
         public string MakeSelectSql() => NeedWhereClause() ? MakeSelectSqlWithWhereClause(): MakeSelectSqlWithoutWhereClause();

@@ -146,9 +146,11 @@ namespace DbLink
 
         public virtual string MakeUpdateSqlCommand()
         {
+            _tableFieldManager.UpdateFields();
+            TableField keyField = FindTableFieldByName(_primaryKeyName);
             string updateSql = $"update {TableName} set" + Space;
             updateSql += MakeUpdateValuesClause() + Space;
-            updateSql += $"where {_primaryKeyName}={GetFieldValue(_primaryKeyName)}";
+            updateSql += $"where {keyField.MakeClause()}";
             return updateSql;
         }
 
@@ -172,7 +174,12 @@ namespace DbLink
             return updateValuesClause;
         }
 
-        protected string MakeDeleteSqlCommand() => $"delete from {TableName} where {_primaryKeyName}={GetFieldValue(_primaryKeyName)}";
+        public string MakeDeleteSqlCommand()
+        {
+            _tableFieldManager.UpdateFields();
+            TableField keyField = FindTableFieldByName(_primaryKeyName);
+            return $"delete from {TableName} where {keyField.MakeClause()}";
+        }
 
         public virtual void Insert()
         {

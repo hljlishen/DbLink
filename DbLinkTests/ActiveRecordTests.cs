@@ -17,6 +17,7 @@ namespace DbLink.Tests
             TestConditionFirstNullAndStringNull();
             TestConditionSecondNull();
             TestCondition3ThNullAndIntNull();
+            TestDeleteSql();
         }
 
         [TestMethod()]
@@ -102,6 +103,19 @@ namespace DbLink.Tests
             string actual = _user.MakeInsertSqlCommand();
 
             Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        private void TestDeleteSql()
+        {
+            Setup();
+            _user.Id = 3;
+
+            string actual = _user.MakeDeleteSqlCommand();
+            string expected = "delete from User where Id=3";
+            _user.Delete();
+
+            Assert.AreEqual(actual,expected);
         }
     }
 }

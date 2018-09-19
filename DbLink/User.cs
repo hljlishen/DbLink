@@ -8,6 +8,12 @@ namespace DbLink
         {
         }
 
+        //private int _thisIsNotProperty = 13;
+
+        //public int Get() => _thisIsNotProperty;
+        //public int Set(int value) => _thisIsNotProperty = value;
+
+        //public int? ThisIsProperty { get; set; } = 14;
         public int? Id
         {
             get;
