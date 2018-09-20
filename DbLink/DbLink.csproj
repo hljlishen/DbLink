@@ -49,12 +49,11 @@
     <Compile Include="AccessDrive.cs" />
     <Compile Include="ActiveRecord.cs" />
     <Compile Include="DatabaseDrive.cs" />
-    <Compile Include="ISelectSqlMaker.cs" />
     <Compile Include="SelectCondition\DateDiffLessThanMinutesCondition.cs" />
     <Compile Include="SelectCondition\DateBetweenOpenInterval.cs" />
     <Compile Include="SelectCondition\DateEqual.cs" />
     <Compile Include="SelectCondition\DateTimeBetweenCloseInterval.cs" />
-    <Compile Include="DbLink.cs" />
+    <Compile Include="DbLinkGateway.cs" />
     <Compile Include="DbLinkFactory.cs" />
     <Compile Include="SelectCondition\DoubleBetween.cs" />
     <Compile Include="IDatabaseDrive.cs" />
@@ -71,7 +70,7 @@
     <Compile Include="SelectCondition\StringEqual.cs" />
     <Compile Include="SelectCondition\StringLike.cs" />
     <Compile Include="TableField.cs" />
-    <Compile Include="TableFieldManager.cs" />
+    <Compile Include="TableFieldPropertyMap.cs" />
     <Compile Include="User.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

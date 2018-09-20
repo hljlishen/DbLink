@@ -36,7 +36,7 @@ namespace DbLink.Tests
 
         private void Setup()
         {
-            DbLinkFactory factory = DbLink.CreateFactory(DataBaseType.MySql, @"Server=localhost;Database=activerecordtest;user id= root;password= root;");
+            DbLinkFactory factory = DbLinkGateway.CreateFactory(DatabaseType.MySql);
             _user = new User(factory);
         }
 

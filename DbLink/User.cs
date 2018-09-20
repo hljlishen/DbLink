@@ -4,7 +4,7 @@ namespace DbLink
 {
     public class User : ActiveRecord
     {
-        public User(DbLinkFactory factory) : base("User","Id", factory)
+        public User(DbLinkFactory factory) : base("User","Id",DatabaseType.MySql, @"Server=localhost;Database=activerecordtest;user id= root;password= root;")
         {
         }
 

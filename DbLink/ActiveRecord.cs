@@ -11,21 +11,43 @@ namespace DbLink
         private readonly List<TableField> _dataBaseFields;
         protected string TableName;
         protected IDatabaseDrive DatabaseDrive;
-        protected IDateTimeFormater DateTimeFormater;
         private string _primaryKeyName = "";
         private TableField _primaryKeyField;
         private const string Space = " ";
-        private readonly TableFieldManager _tableFieldManager;
+        private readonly TableFieldPropertyMap _tableFieldPropertyMap;
+        private readonly DatabaseType _databaseType;
 
-        protected ActiveRecord(string tableName, string primaryKeyName, DbLinkFactory factory)
+        protected ActiveRecord(string tableName, string primaryKeyName, DatabaseType databaseType, string connectionStr)
         {
             TableName = tableName;
-            DatabaseDrive = factory.CreateDatabaseDrive();
-            DateTimeFormater = factory.CreateDateTimeFormater();
+            _databaseType = databaseType;
+            DbLinkFactory factory = DbLinkGateway.CreateFactory(databaseType);
+            DatabaseDrive = factory.CreateDatabaseDrive(connectionStr);
+
             _dataBaseFields = new List<TableField>();
-            _tableFieldManager = new TableFieldManager(this, DateTimeFormater);
-            AddTableFields(_tableFieldManager.CreateTableFields());
+            _tableFieldPropertyMap = new TableFieldPropertyMap(this);
+            AddTableFields(CreateTableFields());
             SetPrimaryKey(primaryKeyName);
+        }
+
+        private IEnumerable<TableField> CreateTableFields()
+        {
+            var propertyInfos = GetType().GetProperties();
+
+            foreach (PropertyInfo propertyInfo in propertyInfos)
+            {
+                TableField field = TableField.Parse(propertyInfo, _databaseType);
+                _tableFieldPropertyMap.AddMap(propertyInfo, field);
+                yield return field;
+            }
+        }
+
+        private void AddTableFields(IEnumerable<TableField> fields)
+        {
+            foreach (TableField tableField in fields)
+            {
+                AddField(tableField);
+            }
         }
 
         private void SetPrimaryKey(string primaryKeyName)
@@ -36,14 +58,6 @@ namespace DbLink
                 _primaryKeyField = FindTableFieldByName(primaryKeyName);
             }
             else throw new Exception($"指定的主键<{primaryKeyName}>不存在");
-        }
-
-        private void AddTableFields(IEnumerable<TableField> fields)
-        {
-            foreach (TableField tableField in fields)
-            {
-                AddField(tableField);
-            }
         }
 
         private void AddField(TableField field)
@@ -67,12 +81,6 @@ namespace DbLink
             return false;
         }
 
-        //private void SetFieldValue(string fieldName, object value)
-        //{
-        //    TableField field = FindTableFieldByName(fieldName);
-        //    field.SetValue(value);
-        //}
-
         private TableField FindTableFieldByName(string fieldName)
         {
             if (!FieldNameAlreadyExists(fieldName))
@@ -86,14 +94,6 @@ namespace DbLink
 
             return null;
         }
-
-        //private object GetFieldValue(string fieldName)
-        //{
-        //    if (!FieldNameAlreadyExists(fieldName))
-        //        throw new Exception($"域名<{fieldName}>不存在");
-        //    TableField field = FindTableFieldByName(fieldName);
-        //    return field.FieldValue;
-        //}
 
         public string MakeInsertSqlCommand() => $"insert into {TableName} " + MakeSelectFieldsClause() + MakeSelectValuesClause();
 
@@ -163,7 +163,7 @@ namespace DbLink
                         updateValuesClause = RemoveLastIndex(updateValuesClause);
                     continue;
                 }
-                updateValuesClause += field.MakeUpdateClause();
+                updateValuesClause += field.MakeClause();
                 if (!IsTheLastField(field))
                     updateValuesClause += ",";
             }
@@ -171,7 +171,7 @@ namespace DbLink
             return updateValuesClause;
         }
 
-        public void UpdateFieldValue() => _tableFieldManager.UpdateFields(); 
+        public void UpdateFieldValue() => _tableFieldPropertyMap.UpdateFields(); 
 
         public string MakeDeleteSqlCommand() => $"delete from {TableName} where {_primaryKeyField.MakeClause()}";
 
@@ -215,42 +215,28 @@ namespace DbLink
         public virtual void LoadDataRow(DataRow row)
         {
             PropertyInfo[] property = GetType().GetProperties();
-            try
+            foreach (PropertyInfo propertyInfo in property)
             {
-                foreach (PropertyInfo propertyInfo in property)
-                {
-                    string name = propertyInfo.Name;
-                    object value = row[name];
-                    if(value is System.DBNull)
-                        propertyInfo.SetValue(this, null);
-                    else
-                        propertyInfo.SetValue(this, value);
-                }
-            }
-            catch (Exception e)
-            {
-                throw e;
+                string name = propertyInfo.Name;
+                object value = row[name];
+                if(value == null || value is DBNull)
+                    propertyInfo.SetValue(this, null);
+                else
+                    propertyInfo.SetValue(this, value);
             }
         }
 
         public virtual void LoadDataGridViewRow(DataGridViewRow row)
         {
             PropertyInfo[] property = GetType().GetProperties();
-            try
+            foreach (PropertyInfo propertyInfo in property)
             {
-                foreach (PropertyInfo propertyInfo in property)
-                {
-                    string name = propertyInfo.Name;
-                    object value = row.Cells[name].Value;
-                    if (value is System.DBNull)
-                        propertyInfo.SetValue(this, null);
-                    else
-                        propertyInfo.SetValue(this, value);
-                }
-            }
-            catch(Exception e)
-            {
-                throw e;
+                string name = propertyInfo.Name;
+                object value = row.Cells[name].Value;
+                if (value == null || value is DBNull)
+                    propertyInfo.SetValue(this, null);
+                else
+                    propertyInfo.SetValue(this, value);
             }
         }
     }

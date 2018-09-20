@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Reflection;
 
 namespace DbLink
 {
@@ -15,12 +16,6 @@ namespace DbLink
 
         public bool HasValue() => FieldValue != null;
 
-        public string MakeInsertClause() => MakeClause();
-
-        public string MakeUpdateClause() => MakeClause();
-
-        public string MakeDeleteClause() => MakeClause();
-
         public abstract string MakeClause();
 
         public abstract string GetValueString();
@@ -28,6 +23,35 @@ namespace DbLink
         public abstract void SetValue(object value);
 
         public string GetFieldName() => FieldName;
+
+        public static TableField Parse(PropertyInfo property, DatabaseType type)
+        {
+            if (property.PropertyType == typeof(uint?))
+            {
+                return new UintField(property.Name, null);
+            }
+            if (property.PropertyType == typeof(int?))
+            {
+                return new IntField(property.Name, null);
+            }
+
+            if (property.PropertyType == typeof(string))
+            {
+                return new StringField(property.Name, null);
+            }
+
+            if (property.PropertyType == typeof(double?) || property.PropertyType == typeof(float?))
+            {
+                return new DoubleField(property.Name, null);
+            }
+
+            if (property.PropertyType == typeof(DateTime?))
+            {
+                return new DateTimeField(property.Name, null, DbLinkGateway.CreateFactory(type).CreateDateTimeFormater());
+            }
+
+            throw new Exception($"不支持的类型{property.PropertyType}");
+        }
     }
 
     internal class StringField : TableField

@@ -2,50 +2,36 @@
 {
     public abstract class DbLinkFactory
     {
-        protected string ConnectString;
-
-        protected DbLinkFactory(string connectString)
-        {
-            ConnectString = connectString;
-        }
-
-        public ISelectSqlMaker CreateSelectSqlMaker(string tableName) => new SelectSqlMaker(tableName);
-
-        public abstract IDatabaseDrive CreateDatabaseDrive();
+        public abstract IDatabaseDrive CreateDatabaseDrive(string connectString);
 
         public abstract IDateTimeFormater CreateDateTimeFormater();
+
+        public abstract DatabaseType GetDataBaseType();
     }
 
     internal class MySqlFactory : DbLinkFactory
     {
-        public MySqlFactory(string connectString) : base(connectString)
-        {
-        }
 
         public override IDateTimeFormater CreateDateTimeFormater() => new StanderdStyleDateTimeFormater();
+        public override DatabaseType GetDataBaseType() => DatabaseType.MySql;
 
-        public override IDatabaseDrive CreateDatabaseDrive() => MySqlDrive.GetInstance(ConnectString);
+        public override IDatabaseDrive CreateDatabaseDrive(string connectString) => MySqlDrive.GetInstance(connectString);
     }
 
     internal class AccessFactory : DbLinkFactory
     {
-        public AccessFactory(string connectString) : base(connectString)
-        {
-        }
-
         public override IDateTimeFormater CreateDateTimeFormater() => new AccessStyleDateTimeFormater();
+        public override DatabaseType GetDataBaseType() => DatabaseType.Access;
 
-        public override IDatabaseDrive CreateDatabaseDrive() => AccessDrive.GetInstance(ConnectString);
+        public override IDatabaseDrive CreateDatabaseDrive(string connectString) => AccessDrive.GetInstance(connectString);
     }
 
     internal class SqlServerFactory : DbLinkFactory
     {
-        public SqlServerFactory(string connectString) : base(connectString)
-        {
-        }
 
-        public override IDatabaseDrive CreateDatabaseDrive() => SqlServerDrive.GetInstance(ConnectString);
+        public override IDatabaseDrive CreateDatabaseDrive(string connectString) => SqlServerDrive.GetInstance(connectString);
 
         public override IDateTimeFormater CreateDateTimeFormater() => new StanderdStyleDateTimeFormater();
+        public override DatabaseType GetDataBaseType() => DatabaseType.SqlServer;
     }
 }
