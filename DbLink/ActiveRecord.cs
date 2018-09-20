@@ -26,11 +26,20 @@ namespace DbLink
 
             _dataBaseFields = new List<TableField>();
             _tableFieldPropertyMap = new TableFieldPropertyMap(this);
-            AddTableFields(CreateTableFields());
+            CreateTableFields();
             SetPrimaryKey(primaryKeyName);
         }
 
-        private IEnumerable<TableField> CreateTableFields()
+        private void CreateTableFields()
+        {
+            IEnumerable<TableField> fields = GenerateTableFields();
+            foreach (TableField tableField in fields)
+            {
+                AddField(tableField);
+            }
+        }
+
+        private IEnumerable<TableField> GenerateTableFields()
         {
             var propertyInfos = GetType().GetProperties();
 
@@ -42,12 +51,14 @@ namespace DbLink
             }
         }
 
-        private void AddTableFields(IEnumerable<TableField> fields)
+        private void AddField(TableField field)
         {
-            foreach (TableField tableField in fields)
-            {
-                AddField(tableField);
-            }
+            string fieldName = field.GetFieldName();
+
+            if (FieldNameAlreadyExists(fieldName))
+                throw new Exception($"添加的域已经在列表中<{fieldName}>");
+
+            _dataBaseFields.Add(field);
         }
 
         private void SetPrimaryKey(string primaryKeyName)
@@ -58,16 +69,6 @@ namespace DbLink
                 _primaryKeyField = FindTableFieldByName(primaryKeyName);
             }
             else throw new Exception($"指定的主键<{primaryKeyName}>不存在");
-        }
-
-        private void AddField(TableField field)
-        {
-            string fieldName = field.GetFieldName();
-
-            if (FieldNameAlreadyExists(fieldName))
-                throw new Exception($"添加的域已经在列表中<{fieldName}>");
-
-            _dataBaseFields.Add(field);
         }
 
         private bool FieldNameAlreadyExists(string fieldName)
@@ -106,7 +107,7 @@ namespace DbLink
                 if(!field.HasValue())
                 {
                     if (IsTheLastField(field))      //列表中最后一个域为空值时，应该删除上一个
-                        fieldsClause = RemoveLastIndex(fieldsClause);
+                        fieldsClause = RemoveLastChar(fieldsClause);
                     continue;
                 }
                 fieldsClause += field.GetFieldName();
@@ -120,7 +121,7 @@ namespace DbLink
 
         private bool IsTheLastField(TableField field) => field == _dataBaseFields[_dataBaseFields.Count - 1];
 
-        private string RemoveLastIndex(string str) => str.Substring(0, str.Length - 1);
+        private string RemoveLastChar(string str) => str.Substring(0, str.Length - 1);
 
         private string MakeSelectValuesClause()
         {
@@ -131,7 +132,7 @@ namespace DbLink
                 if (!field.HasValue())
                 {
                     if (IsTheLastField(field))      
-                        valuesClause = RemoveLastIndex(valuesClause);
+                        valuesClause = RemoveLastChar(valuesClause);
                     continue;
                 }
                 valuesClause += field.GetValueString();
@@ -160,7 +161,7 @@ namespace DbLink
                 if (!field.HasValue())
                 {
                     if (IsTheLastField(field))
-                        updateValuesClause = RemoveLastIndex(updateValuesClause);
+                        updateValuesClause = RemoveLastChar(updateValuesClause);
                     continue;
                 }
                 updateValuesClause += field.MakeClause();
